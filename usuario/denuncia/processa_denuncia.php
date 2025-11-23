@@ -12,6 +12,79 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Função para gerar protocolo aleatório
+function gerarProtocolo($tamanho = 10) {
+    return strtoupper(substr(md5(uniqid((string) rand(), true)), 0, $tamanho));
+}
+
+// Função para mostrar a página de sucesso
+function mostrarusuarioucesso($protocolo) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Denúncia Enviada</title>
+        <link rel="stylesheet" href="../../css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="shortcut icon" href="../../assets/Logo%20infantil.png" type="image/x-icon">
+        <style>
+            .success-page {
+                    max-width: 600px;
+                    margin: calc(var(--header-height, 100px) + 12px) auto;
+                    padding: 30px;
+                    background: #fff;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                .protocolo {
+                    font-size: 24px;
+                    color: #11b85a;
+                    margin: 20px 0;
+                    padding: 10px;
+                    background: #f8f9fa;
+                    border-radius: 4px;
+                }
+            .btn-process{
+                background-color: #9fff96ff;
+                color: #000000;
+                text-decoration: none;
+                border-radius: 5px;
+                transition: 0.3s ease;
+                cursor: pointer;
+                border: solid 2px #058401ff;
+                display: inline-block;
+            }
+
+            .btn-process:hover {
+                background-color: #64000aff;
+                color: #ffffff;
+            }
+
+            @media (max-width:480px) {
+                .success-page { margin: calc(var(--header-height, 80px) + 8px) 12px; padding: 18px; }
+                .protocolo { font-size: 18px; }
+                .btn-process, .btn-denunciar { display: block; width: 100%; margin: 8px 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="success-page">
+            <h2>Denúncia enviada com sucesso!</h2>
+            <p>Seu protocolo é:</p>
+            <div class="protocolo"><strong><?php echo $protocolo; ?></strong></div>
+            <p>Guarde este número para consultar sua denúncia.</p>
+            <a href="denuncia.php" class="btn btn-denunciar mt-3">Voltar</a>
+            <a href="consulta.php" class="btn btn-process mt-3">Consultar Denúncia</a>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </body>
+    </html>
+    <?php
+}
+
 // Verificar se é refresh (GET) após envio bem-sucedido: mostra a página de sucesso novamente
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['ultimo_protocolo'])) {
     mostrarusuarioucesso($_SESSION['ultimo_protocolo']);
@@ -22,11 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['ultimo_protocolo']
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: denuncia.php');
     exit;
-}
-
-// Função para gerar protocolo aleatório
-function gerarProtocolo($tamanho = 10) {
-    return strtoupper(substr(md5(uniqid((string) rand(), true)), 0, $tamanho));
 }
 
 
@@ -119,74 +187,6 @@ if ($stmt === false) {
 }
 
 $stmt->bind_param("ssssssssss", $protocolo, $cep, $estado, $cidade, $bairro, $rua, $numero, $tipo_crime, $complemento, $arquivo);
-
-// Função para mostrar a página de sucesso
-function mostrarusuarioucesso($protocolo) {
-    ?>
-    <!DOCTYPE html>
-    <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Denúncia Enviada</title>
-        <link rel="stylesheet" href="../../css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <link rel="shortcut icon" href="../../assets/Logo%20infantil.png" type="image/x-icon">
-        <style>
-            .success-page {
-                    max-width: 600px;
-                    margin: calc(var(--header-height, 100px) + 12px) auto;
-                    padding: 30px;
-                    background: #fff;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    text-align: center;
-                }
-                .protocolo {
-                    font-size: 24px;
-                    color: #11b85a;
-                    margin: 20px 0;
-                    padding: 10px;
-                    background: #f8f9fa;
-                    border-radius: 4px;
-                }
-            .btn-process{
-                background-color: #9fff96ff;
-                color: #000000;
-                text-decoration: none;
-                border-radius: 5px;
-                transition: 0.3s ease;
-                cursor: pointer;
-                border: solid 2px #058401ff;
-                display: inline-block;
-            }
-
-            .btn-process:hover {
-                background-color: #64000aff;
-                color: #ffffff;
-            }
-
-            @media (max-width:480px) {
-                .success-page { margin: calc(var(--header-height, 80px) + 8px) 12px; padding: 18px; }
-                .protocolo { font-size: 18px; }
-                .btn-process, .btn-denunciar { display: block; width: 100%; margin: 8px 0; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="success-page">
-            <h2>Denúncia enviada com sucesso!</h2>
-            <p>Seu protocolo é:</p>
-            <div class="protocolo"><strong><?php echo $protocolo; ?></strong></div>
-            <p>Guarde este número para consultar sua denúncia.</p>
-            <a href="denuncia.php" class="btn btn-denunciar mt-3">Voltar</a>
-            <a href="consulta.php" class="btn btn-process mt-3">Consultar Denúncia</a>
-        </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    </body>
-    </html>
-    <?php
-}
 
 // Tentar executar a query
 try {
