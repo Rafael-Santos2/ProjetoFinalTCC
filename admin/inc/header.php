@@ -1,10 +1,9 @@
 <?php
-// Calcula o caminho base relativo a partir da pasta do projeto
-$baseUrl = dirname(dirname($_SERVER['PHP_SELF']));
+require_once __DIR__ . '/../../config.php';
 ?>
 <header class="d-flex flex-wrap">
     <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="<?= htmlspecialchars($baseUrl) ?>/usuario/index.php"><img src="<?= htmlspecialchars($baseUrl) ?>/assets/Logo%20infantil.png" alt="Logo do site"></a>
+        <a class="navbar-brand" href="<?= htmlspecialchars($base_url) ?>/usuario/index.php"><img src="<?= htmlspecialchars($base_url) ?>/assets/Logo%20infantil.png" alt="Logo do site"></a>
 
         <div class="collapse navbar-collapse" id="menuNav">
         </div>
