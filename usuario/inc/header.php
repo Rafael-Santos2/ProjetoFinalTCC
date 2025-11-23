@@ -9,7 +9,7 @@ if (!$base_url) {
 ?>
 <header class="d-flex flex-wrap">
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="<?= $base_url ?>/usuario/index.php"><img src="../../assets/Logo%20infantil.png" alt="Logo do site"></a>
+            <a class="navbar-brand" href="/index.php"><img src="../../assets/Logo%20infantil.png" alt="Logo do site"></a>
             <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
                 <span class="toggler-icon top-bar"></span>
                 <span class="toggler-icon middle-bar"></span>
