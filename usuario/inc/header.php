@@ -18,19 +18,19 @@ if (!$base_url) {
 
             <div class="collapse navbar-collapse" id="menuNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/index.php"><span class="rainbow1">Página Principal</span></a>
+                    <li class="nav-item"><a class="nav-link" href="/usuario/index.php"><span class="rainbow1">Página Principal</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="/sobre.php"><span class="rainbow2">Sobre nós</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="/responsavel.php"><span class="rainbow3">Área do Responsável</span></a>
+                    <li class="nav-item"><a class="nav-link" href="/usuario/sobre.php"><span class="rainbow2">Sobre nós</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/usuario/responsavel.php"><span class="rainbow3">Área do Responsável</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="/educativa.php"><span class="rainbow4">Página Educativa</span></a>
+                    <li class="nav-item"><a class="nav-link" href="/usuario/educativa.php"><span class="rainbow4">Página Educativa</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="/contato.php"><span class="rainbow5">Contato</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/usuario/contato.php"><span class="rainbow5">Contato</span></a></li>
                 </ul>
             </div>
 
             <div class="denunciar">
-                <a href="/denuncia/denuncia.php" class="btn btn-denunciar">Denuncie</a>
+                <a href="/usuario/denuncia/denuncia.php" class="btn btn-denunciar">Denuncie</a>
             </div>
         </nav>
     </header>
