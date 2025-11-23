@@ -13,19 +13,19 @@ $baseUrl = dirname(dirname($_SERVER['PHP_SELF']));
 
             <div class="collapse navbar-collapse" id="menuNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/usuario/index.php"><span class="rainbow1">Página Principal</span></a>
+                    <li class="nav-item"><a class="nav-link" href="<?= $base_url ?>/usuario/index.php"><span class="rainbow1">Página Principal</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/usuario/sobre.php"><span class="rainbow2">Sobre nós</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/usuario/responsavel.php"><span class="rainbow3">Área do Responsável</span></a>
+                    <li class="nav-item"><a class="nav-link" href="<?= $base_url ?>/usuario/sobre.php"><span class="rainbow2">Sobre nós</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $base_url ?>/usuario/responsavel.php"><span class="rainbow3">Área do Responsável</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/usuario/educativa.php"><span class="rainbow4">Página Educativa</span></a>
+                    <li class="nav-item"><a class="nav-link" href="<?= $base_url ?>/usuario/educativa.php"><span class="rainbow4">Página Educativa</span></a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/usuario/contato.php"><span class="rainbow5">Contato</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $base_url ?>/usuario/contato.php"><span class="rainbow5">Contato</span></a></li>
                 </ul>
             </div>
 
             <div class="denunciar">
-                <a href="<?= htmlspecialchars($baseUrl) ?>/usuario/denuncia/denuncia.php" class="btn btn-denunciar">Denuncie</a>
+                <a href="<?= $base_url ?>/usuario/denuncia/denuncia.php" class="btn btn-denunciar">Denuncie</a>
             </div>
         </nav>
     </header>
