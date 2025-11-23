@@ -278,7 +278,7 @@ include __DIR__ . '/inc/conexao.php';
                     echo '<td data-label="Tipo de crime">' . htmlspecialchars($row['tipo_crime']) . '</td>';
                     echo '<td data-label="Arquivo" colspan="4">';
                     if (!empty($row['arquivo'])) {
-                        $fileUrl = 'uploads/' . rawurlencode($row['arquivo']);
+                        $fileUrl = $base_url . '/uploads/' . rawurlencode($row['arquivo']);
                         echo '<a class="btn-file" href="' . $fileUrl . '" target="_blank">Ver Arquivo</a>';
                     } else {
                         echo '<em>Nenhum arquivo anexado</em>';
