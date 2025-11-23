@@ -18,10 +18,10 @@ function getEnvVar($key, $default = '') {
  * MYSQLPORT
  */
 
-define('DB_HOST', getEnvVar('MYSQLHOST', 'localhost'));
+define('DB_HOST', getEnvVar('MYSQLHOST', 'mysql.railway.internal'));
 define('DB_USER', getEnvVar('MYSQLUSER', 'root'));
-define('DB_PASS', getEnvVar('MYSQLPASSWORD', ''));
-define('DB_NAME', getEnvVar('MYSQLDATABASE', 'voz_infantil'));
+define('DB_PASS', getEnvVar('MYSQLPASSWORD', 'cIwmdfFAGccxnPxOtlcckmYKiuQeTwiI'));
+define('DB_NAME', getEnvVar('MYSQLDATABASE', 'railway'));
 define('DB_PORT', getEnvVar('MYSQLPORT', '3306'));
 
 $base_url = getEnvVar('BASE_URL', '');
