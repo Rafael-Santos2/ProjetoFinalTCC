@@ -1,7 +1,4 @@
 <?php
-// 1. Tenta obter o valor da variável de ambiente 'BASE_URL' do Railway.
-$base_url = getenv('BASE_URL'); 
-
 // 2. Fallback: Coloque o seu domínio público real do Railway aqui.
 if (!$base_url) {
     $base_url = 'projetofinaltcc-production.up.railway.app'; 
