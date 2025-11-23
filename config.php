@@ -24,7 +24,12 @@ define('DB_PASS', getEnvVar('MYSQLPASSWORD', ''));
 define('DB_NAME', getEnvVar('MYSQLDATABASE', 'voz_infantil'));
 define('DB_PORT', getEnvVar('MYSQLPORT', '3306'));
 
-define('BASE_URL', getEnvVar('BASE_URL', 'http://localhost'));
+$base_url = getEnvVar('BASE_URL', '');
+if (!$base_url) {
+    $base_url = 'https://projetofinaltcc-production.up.railway.app';
+}
+
+define('BASE_URL', $base_url);
 define('ENVIRONMENT', getEnvVar('ENVIRONMENT', 'development'));
 
 if (ENVIRONMENT === 'development') {

@@ -1,12 +1,16 @@
 <?php
 
-// Habilitar exibição de erros para debug
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Incluir conexão ANTES de usar sessão (config.php pode gerenciar sessão)
+$conexao_path = __DIR__ . '/inc/conexao.php';
+if (!file_exists($conexao_path)) {
+    die("Erro: Arquivo de conexão não encontrado em: " . $conexao_path);
+}
+include $conexao_path;
 
 // Iniciar ou resumir a sessão
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Verificar se é refresh (GET) após envio bem-sucedido: mostra a página de sucesso novamente
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['ultimo_protocolo'])) {
@@ -14,14 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['ultimo_protocolo']
     exit;
 }
 
-// Verificar se o arquivo de conexão existe (uso centralizado em inc/)
-$conexao_path = __DIR__ . '/inc/conexao.php';
-if (!file_exists($conexao_path)) {
-    die("Erro: Arquivo de conexão não encontrado em: " . $conexao_path);
+// Se não for POST, redirecionar para a página de denúncia
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: denuncia.php');
+    exit;
 }
-
-// include conexão (padrão único centralizado)
-include $conexao_path;
 
 // Função para gerar protocolo aleatório
 function gerarProtocolo($tamanho = 10) {
@@ -31,6 +32,9 @@ function gerarProtocolo($tamanho = 10) {
 
 // POST válido: sempre gerar um novo protocolo para esta submissão
 $protocolo = gerarProtocolo();
+
+// Log para debug no Railway
+error_log("Processando denúncia - Protocolo: " . $protocolo);
 
 // CSRF: validação opcional (só bloqueia se ambos existirem e divergirem)
 if (isset($_SESSION['csrf_token']) && isset($_POST['csrf_token'])) {
@@ -50,13 +54,20 @@ $numero = isset($_POST['numero']) ? trim($_POST['numero']) : '';
 $tipo_crime = isset($_POST['tipo_crime']) ? trim($_POST['tipo_crime']) : '';
 $complemento = isset($_POST['complemento']) ? trim($_POST['complemento']) : '';
 
+error_log("Dados recebidos - CEP: $cep, Cidade: $cidade, Tipo: $tipo_crime");
+
 // Upload de arquivo (opcional)
 $arquivo = "";
-if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error']) && $_FILES['arquivo']['error'] == 0) {
-    // salvar na pasta uploads na raiz do projeto
-    $pasta = __DIR__ . '/../../uploads/';
+if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error'])) {
+    error_log("Upload detectado - Error code: " . $_FILES['arquivo']['error']);
+    
+    if ($_FILES['arquivo']['error'] == 0) {
+        // salvar na pasta uploads na raiz do projeto
+        $pasta = __DIR__ . '/../../uploads/';
     if (!is_dir($pasta)) {
-        mkdir($pasta, 0777, true);
+        if (!mkdir($pasta, 0755, true)) {
+            error_log("Falha ao criar diretório de uploads: " . $pasta);
+        }
     }
     // Validação básica de tipo e tamanho (mais seguro)
     $allowedMime = [
@@ -69,18 +80,22 @@ if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error']) && $_FILES['
     $tipo = mime_content_type($_FILES['arquivo']['tmp_name']);
     $tamanho = (int)$_FILES['arquivo']['size'];
     if (!in_array($tipo, $allowedMime, true)) {
-        echo "<p>Tipo de arquivo não permitido.</p>";
+        error_log("Tipo de arquivo não permitido: " . $tipo);
     } elseif ($tamanho > $maxBytes) {
-        echo "<p>Arquivo muito grande. Tamanho máximo permitido: 50MB.</p>";
+        error_log("Arquivo muito grande: " . $tamanho . " bytes");
     } else {
-    $nomeArquivo = uniqid() . '-' . basename($_FILES['arquivo']['name']);
-    $destino = $pasta . $nomeArquivo;
-    if (move_uploaded_file($_FILES['arquivo']['tmp_name'], $destino)) {
-        $arquivo = $nomeArquivo; // armazenamos apenas o nome do arquivo no banco
-    } else {
-        // falha no upload: manter $arquivo vazio
-        $arquivo = "";
+        $nomeArquivo = uniqid() . '-' . basename($_FILES['arquivo']['name']);
+        $destino = $pasta . $nomeArquivo;
+        if (move_uploaded_file($_FILES['arquivo']['tmp_name'], $destino)) {
+            $arquivo = $nomeArquivo; // armazenamos apenas o nome do arquivo no banco
+            error_log("Arquivo salvo com sucesso: " . $nomeArquivo);
+        } else {
+            error_log("Falha ao mover arquivo para: " . $destino);
+            $arquivo = "";
+        }
     }
+    } else {
+        error_log("Erro no upload - Code: " . $_FILES['arquivo']['error']);
     }
 }
 
@@ -91,8 +106,11 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 // $conn deve ser provido pelo arquivo de conexão incluído
 if (!isset($conn) || $conn === null) {
+    error_log('ERRO: Conexão ao banco indisponível');
     die('Erro: conexão ao banco indisponível. Verifique o arquivo de conexão.');
 }
+
+error_log("Conexão com banco estabelecida. Preparando query...");
 
 // Preparar statement
 $stmt = $conn->prepare($sql);
@@ -113,7 +131,7 @@ function mostrarusuarioucesso($protocolo) {
         <title>Denúncia Enviada</title>
         <link rel="stylesheet" href="../../css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <link rel="shortcut icon" href="../../assets/Logo infantil.png" type="image/x-icon">
+        <link rel="shortcut icon" href="../../assets/Logo%20infantil.png" type="image/x-icon">
         <style>
             .success-page {
                     max-width: 600px;
@@ -173,15 +191,19 @@ function mostrarusuarioucesso($protocolo) {
 // Tentar executar a query
 try {
     if ($stmt->execute()) {
+        error_log("Denúncia inserida com sucesso. Protocolo: " . $protocolo);
         // Guardar protocolo para eventuais refresh/consulta imediata
         $_SESSION['ultimo_protocolo'] = $protocolo;
         // PRG: Redirecionar para evitar reenvio de POST e manter o protocolo no refresh
-        header('Location: ' . basename(__FILE__));
+        $redirect_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        header('Location: ' . $redirect_url);
         exit;
     } else {
+        error_log("Erro ao executar query: " . $stmt->error);
         throw new Exception("Erro ao executar a query: " . $stmt->error);
     }
 } catch (Exception $e) {
+    error_log("Exceção capturada: " . $e->getMessage());
     // Erro - mostrar página de erro formatada
     ?>
     <!DOCTYPE html>
