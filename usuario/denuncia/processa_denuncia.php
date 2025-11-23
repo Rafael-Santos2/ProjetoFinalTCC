@@ -101,9 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // POST válido: sempre gerar um novo protocolo para esta submissão
 $protocolo = gerarProtocolo();
 
-// Log para debug no Railway
-error_log("Processando denúncia - Protocolo: " . $protocolo);
-
 // CSRF: validação opcional (só bloqueia se ambos existirem e divergirem)
 if (isset($_SESSION['csrf_token']) && isset($_POST['csrf_token'])) {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
@@ -122,20 +119,13 @@ $numero = isset($_POST['numero']) ? trim($_POST['numero']) : '';
 $tipo_crime = isset($_POST['tipo_crime']) ? trim($_POST['tipo_crime']) : '';
 $complemento = isset($_POST['complemento']) ? trim($_POST['complemento']) : '';
 
-error_log("Dados recebidos - CEP: $cep, Cidade: $cidade, Tipo: $tipo_crime");
-
 // Upload de arquivo (opcional)
 $arquivo = "";
-if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error'])) {
-    error_log("Upload detectado - Error code: " . $_FILES['arquivo']['error']);
-    
-    if ($_FILES['arquivo']['error'] == 0) {
-        // salvar na pasta uploads na raiz do projeto
-        $pasta = __DIR__ . '/../../uploads/';
+if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error']) && $_FILES['arquivo']['error'] == 0) {
+    // salvar na pasta uploads na raiz do projeto
+    $pasta = __DIR__ . '/../../uploads/';
     if (!is_dir($pasta)) {
-        if (!mkdir($pasta, 0755, true)) {
-            error_log("Falha ao criar diretório de uploads: " . $pasta);
-        }
+        @mkdir($pasta, 0755, true);
     }
     // Validação básica de tipo e tamanho (mais seguro)
     $allowedMime = [
@@ -148,22 +138,15 @@ if (isset($_FILES['arquivo']) && isset($_FILES['arquivo']['error'])) {
     $tipo = mime_content_type($_FILES['arquivo']['tmp_name']);
     $tamanho = (int)$_FILES['arquivo']['size'];
     if (!in_array($tipo, $allowedMime, true)) {
-        error_log("Tipo de arquivo não permitido: " . $tipo);
+        // Tipo não permitido - não faz nada
     } elseif ($tamanho > $maxBytes) {
-        error_log("Arquivo muito grande: " . $tamanho . " bytes");
+        // Arquivo muito grande - não faz nada
     } else {
         $nomeArquivo = uniqid() . '-' . basename($_FILES['arquivo']['name']);
         $destino = $pasta . $nomeArquivo;
         if (move_uploaded_file($_FILES['arquivo']['tmp_name'], $destino)) {
-            $arquivo = $nomeArquivo; // armazenamos apenas o nome do arquivo no banco
-            error_log("Arquivo salvo com sucesso: " . $nomeArquivo);
-        } else {
-            error_log("Falha ao mover arquivo para: " . $destino);
-            $arquivo = "";
+            $arquivo = $nomeArquivo;
         }
-    }
-    } else {
-        error_log("Erro no upload - Code: " . $_FILES['arquivo']['error']);
     }
 }
 
@@ -174,11 +157,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 // $conn deve ser provido pelo arquivo de conexão incluído
 if (!isset($conn) || $conn === null) {
-    error_log('ERRO: Conexão ao banco indisponível');
     die('Erro: conexão ao banco indisponível. Verifique o arquivo de conexão.');
 }
-
-error_log("Conexão com banco estabelecida. Preparando query...");
 
 // Preparar statement
 $stmt = $conn->prepare($sql);
@@ -191,7 +171,6 @@ $stmt->bind_param("ssssssssss", $protocolo, $cep, $estado, $cidade, $bairro, $ru
 // Tentar executar a query
 try {
     if ($stmt->execute()) {
-        error_log("Denúncia inserida com sucesso. Protocolo: " . $protocolo);
         // Guardar protocolo para eventuais refresh/consulta imediata
         $_SESSION['ultimo_protocolo'] = $protocolo;
         // PRG: Redirecionar para evitar reenvio de POST e manter o protocolo no refresh
@@ -199,11 +178,9 @@ try {
         header('Location: ' . $redirect_url);
         exit;
     } else {
-        error_log("Erro ao executar query: " . $stmt->error);
         throw new Exception("Erro ao executar a query: " . $stmt->error);
     }
 } catch (Exception $e) {
-    error_log("Exceção capturada: " . $e->getMessage());
     // Erro - mostrar página de erro formatada
     ?>
     <!DOCTYPE html>
