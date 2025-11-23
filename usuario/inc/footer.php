@@ -1,6 +1,11 @@
 <?php
-// Calcula o caminho base relativo a partir da pasta do projeto
-$baseUrl = dirname(dirname($_SERVER['PHP_SELF']));
+// 1. Tenta obter o valor da variável de ambiente 'BASE_URL' do Railway.
+$base_url = getenv('BASE_URL'); 
+
+// 2. Fallback: Coloque o seu domínio público real do Railway aqui.
+if (!$base_url) {
+    $base_url = 'projetofinaltcc-production.up.railway.app'; 
+}
 ?>
 <footer class="footer">
         <div class="container-footer">

@@ -1,6 +1,11 @@
 <?php
-// Calcula o caminho base relativo ao arquivo atual
-$baseUrl = dirname(dirname($_SERVER['PHP_SELF']));
+// 1. Tenta obter o valor da variável de ambiente 'BASE_URL' do Railway.
+$base_url = getenv('BASE_URL'); 
+
+// 2. Fallback: Coloque o seu domínio público real do Railway aqui.
+if (!$base_url) {
+    $base_url = 'projetofinaltcc-production.up.railway.app'; 
+}
 ?>
 <header class="d-flex flex-wrap">
         <nav class="navbar navbar-expand-lg navbar-dark">
