@@ -2,8 +2,8 @@
         <div class="container-footer">
             <!-- LOGOS NO TOPO -->
             <div class="header-footer">
-                <img src="../../../assets/Logo%20infantil.png" alt="Logo Voz Infantil">
-                <img src="../../../assets/Logo%20instituto.png" alt="Logo Instituto Amparo Digital">
+                <img src="/assets/Logo infantil.png" alt="Logo Voz Infantil">
+                <img src="/assets/logo instituto.png" alt="Logo Instituto Amparo Digital">
             </div>
 
             <!-- CONTEÚDO PRINCIPAL -->
